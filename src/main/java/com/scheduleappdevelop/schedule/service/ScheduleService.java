@@ -29,6 +29,7 @@ public class ScheduleService {
     }
 
     // 일정 전체 조회 요청 -> 전체 목록 응답
+    @Transactional(readOnly = true)
     public List<GetSchedulesResponse> find() {
         List<Schedule> schedules = scheduleRepository.findAll();
         return schedules.stream()
