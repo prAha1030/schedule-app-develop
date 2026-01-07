@@ -17,4 +17,11 @@ public class Schedule {
     private String username;
     private String title;
     private String content;
+
+    // 식별 번호를 제외한 속성을 지닌 생성자
+    public Schedule(String username, String title, String content) {
+        this.username = username;
+        this.title = title;
+        this.content = content;
+    }
 }
