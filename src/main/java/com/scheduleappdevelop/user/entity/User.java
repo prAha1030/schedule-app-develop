@@ -17,4 +17,10 @@ public class User extends BaseEntity {
     private Long id;
     private String name;
     private String email;
+
+    // 유저 식별 번호를 제외한 속성을 지닌 생성자
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
 }
