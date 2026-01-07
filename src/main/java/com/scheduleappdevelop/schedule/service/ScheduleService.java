@@ -1,9 +1,6 @@
 package com.scheduleappdevelop.schedule.service;
 
-import com.scheduleappdevelop.schedule.dto.CreateScheduleRequest;
-import com.scheduleappdevelop.schedule.dto.CreateScheduleResponse;
-import com.scheduleappdevelop.schedule.dto.GetOneScheduleResponse;
-import com.scheduleappdevelop.schedule.dto.GetSchedulesResponse;
+import com.scheduleappdevelop.schedule.dto.*;
 import com.scheduleappdevelop.schedule.entity.Schedule;
 import com.scheduleappdevelop.schedule.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +51,19 @@ public class ScheduleService {
                 schedule.getContent(),
                 schedule.getCreatedAt(),
                 schedule.getUpdatedAt()
+        );
+    }
+
+    // 일정 수정 요청 -> 응답으로 변환
+    @Transactional
+    public UpdateScheduleResponse update(Long scheduleId, UpdateScheduleRequest request) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
+                () -> new IllegalStateException("존재하지 않는 일정입니다.")
+        );
+        schedule.update(request.getTitle());
+        return new UpdateScheduleResponse(
+                schedule.getId(),
+                schedule.getTitle()
         );
     }
 }
