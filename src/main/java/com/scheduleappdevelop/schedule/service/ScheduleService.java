@@ -66,4 +66,14 @@ public class ScheduleService {
                 schedule.getTitle()
         );
     }
+
+    // 일정 삭제 요청 -> 식별 번호 기준으로 선별한 일정 삭제
+    @Transactional
+    public void delete(Long scheduleId) {
+        boolean existence = scheduleRepository.existsById(scheduleId);
+        if (!existence) {
+            throw new IllegalStateException("존재하지 않는 일정입니다.");
+        }
+        scheduleRepository.deleteById(scheduleId);
+    }
 }
