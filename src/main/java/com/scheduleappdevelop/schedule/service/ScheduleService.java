@@ -42,6 +42,7 @@ public class ScheduleService {
     }
 
     // 일정 단건 조회 요청 -> 식별 번호에 따른 일정 응답
+    @Transactional(readOnly = true)
     public GetOneScheduleResponse findOne(Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new IllegalStateException("존재하지 않는 일정입니다.")
