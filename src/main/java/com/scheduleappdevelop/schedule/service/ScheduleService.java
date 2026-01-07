@@ -2,6 +2,7 @@ package com.scheduleappdevelop.schedule.service;
 
 import com.scheduleappdevelop.schedule.dto.CreateScheduleRequest;
 import com.scheduleappdevelop.schedule.dto.CreateScheduleResponse;
+import com.scheduleappdevelop.schedule.dto.GetOneScheduleResponse;
 import com.scheduleappdevelop.schedule.dto.GetSchedulesResponse;
 import com.scheduleappdevelop.schedule.entity.Schedule;
 import com.scheduleappdevelop.schedule.repository.ScheduleRepository;
@@ -38,5 +39,20 @@ public class ScheduleService {
                         s.getUsername(),
                         s.getTitle()
                 )).toList();
+    }
+
+    // 일정 단건 조회 요청 -> 식별 번호에 따른 일정 응답
+    public GetOneScheduleResponse findOne(Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
+                () -> new IllegalStateException("존재하지 않는 일정입니다.")
+        );
+        return new GetOneScheduleResponse(
+                schedule.getId(),
+                schedule.getUsername(),
+                schedule.getTitle(),
+                schedule.getContent(),
+                schedule.getCreatedAt(),
+                schedule.getUpdatedAt()
+        );
     }
 }
