@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "schedules")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Schedule {
+public class Schedule extends BaseEntity {
     // 일정 식별 번호, 작성자명, 일정 제목, 일정 내용
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
