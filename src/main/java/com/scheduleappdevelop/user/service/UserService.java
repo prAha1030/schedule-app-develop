@@ -1,6 +1,8 @@
 package com.scheduleappdevelop.user.service;
 
+import com.scheduleappdevelop.config.PasswordEncoder;
 import com.scheduleappdevelop.exception.DuplicateEmailException;
+import com.scheduleappdevelop.exception.PasswordNotMatchException;
 import com.scheduleappdevelop.exception.UserNotFoundException;
 import com.scheduleappdevelop.user.dto.*;
 import com.scheduleappdevelop.user.entity.User;
@@ -16,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // 유저 생성 요청 -> 응답으로 변환
     @Transactional
@@ -24,10 +27,12 @@ public class UserService {
         if (existence) {
             throw new DuplicateEmailException("중복된 이메일이 존재합니다.");
         }
+        // 비밀번호 암호화하여 저장
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
         User user = new User(
                 request.getName(),
                 request.getEmail(),
-                request.getPassword()
+                encodedPassword
         );
         User savedUser = userRepository.save(user);
         return new CreateUserResponse(
@@ -39,8 +44,13 @@ public class UserService {
     // 로그인 요청 -> 응답
     @Transactional
     public SessionUser login(@Valid LoginRequest request) {
-        User user = userRepository.findByEmailAndPassword(request.getEmail(), request.getPassword())
-                .orElseThrow(() -> new UserNotFoundException("존재하지 않는 유저입니다."));
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("등록되지 않은 이메일입니다."));
+        // 비밀번호 검증
+        boolean isPasswordMatch = passwordEncoder.matches(request.getPassword(), user.getPassword());
+        if (!isPasswordMatch) {
+            throw new PasswordNotMatchException("비밀번호가 일치하지 않습니다.");
+        }
         return new SessionUser(
                 user.getId(),
                 user.getName(),
