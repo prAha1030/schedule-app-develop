@@ -3,6 +3,7 @@ package com.scheduleappdevelop.user.service;
 import com.scheduleappdevelop.user.dto.*;
 import com.scheduleappdevelop.user.entity.User;
 import com.scheduleappdevelop.user.repository.UserRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,19 @@ public class UserService {
         );
     }
 
+    // 로그인 요청 -> 응답
+    @Transactional
+    public SessionUser login(@Valid LoginRequest request) {
+        User user = userRepository.findByEmailAndPassword(request.getEmail(), request.getPassword())
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 유저입니다."));
+        return new SessionUser(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getPassword()
+        );
+    }
+
     // 유저 전체 조회 요청 -> 응답
     @Transactional(readOnly = true)
     public List<GetUsersResponse> find() {
@@ -36,8 +50,7 @@ public class UserService {
         return users.stream()
                 .map(u -> new GetUsersResponse(
                         u.getId(),
-                        u.getName(),
-                        u.getEmail()
+                        u.getName()
                 )).toList();
     }
 
