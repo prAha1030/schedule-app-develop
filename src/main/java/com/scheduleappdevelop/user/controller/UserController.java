@@ -33,13 +33,13 @@ public class UserController {
     }
 
     // 유저 전체 조회
-    @GetMapping("/users")
+    @GetMapping("/userlist")
     public ResponseEntity<List<GetUsersResponse>> getUsers() {
         return ResponseEntity.status(HttpStatus.OK).body(userService.find());
     }
 
     // 유저 단건 조회
-    @GetMapping("/myuser")
+    @GetMapping("/users")
     public ResponseEntity<GetOneUserResponse> getOneUser(
             @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.findOne(sessionUser.getId()));

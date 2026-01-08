@@ -39,9 +39,7 @@ public class ScheduleService {
         return schedules.stream()
                 .map(s -> new GetSchedulesResponse(
                         s.getId(),
-                        s.getTitle(),
-                        s.getUser().getId(),
-                        s.getUser().getName()
+                        s.getTitle()
                 )).toList();
     }
 
@@ -62,10 +60,13 @@ public class ScheduleService {
 
     // 일정 수정 요청 -> 응답으로 변환
     @Transactional
-    public UpdateScheduleResponse update(Long scheduleId, UpdateScheduleRequest request) {
+    public UpdateScheduleResponse update(Long userId, Long scheduleId, UpdateScheduleRequest request) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new IllegalStateException("존재하지 않는 일정입니다.")
         );
+        if (!schedule.getId().equals(userId)) {
+            throw new IllegalStateException("다른 유저의 일정을 수정할 수 없습니다.");
+        }
         schedule.update(request.getTitle());
         return new UpdateScheduleResponse(
                 schedule.getId(),
@@ -75,10 +76,12 @@ public class ScheduleService {
 
     // 일정 삭제 요청 -> 식별 번호 기준으로 선별한 일정 삭제
     @Transactional
-    public void delete(Long scheduleId) {
-        boolean existence = scheduleRepository.existsById(scheduleId);
-        if (!existence) {
-            throw new IllegalStateException("존재하지 않는 일정입니다.");
+    public void delete(Long userId, Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
+                () -> new IllegalStateException("존재하지 않는 일정입니다.")
+        );
+        if (!schedule.getId().equals(userId)) {
+            throw new IllegalStateException("다른 유저의 일정을 삭제할 수 없습니다.");
         }
         scheduleRepository.deleteById(scheduleId);
     }
