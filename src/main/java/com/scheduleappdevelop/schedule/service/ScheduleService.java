@@ -3,6 +3,8 @@ package com.scheduleappdevelop.schedule.service;
 import com.scheduleappdevelop.schedule.dto.*;
 import com.scheduleappdevelop.schedule.entity.Schedule;
 import com.scheduleappdevelop.schedule.repository.ScheduleRepository;
+import com.scheduleappdevelop.user.entity.User;
+import com.scheduleappdevelop.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,12 +15,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
+    private final UserRepository userRepository;
 
-    // 일정 생성 요청 -> 응답으로 변환
+    // 유저의 일정 생성 요청 -> 응답으로 변환
     @Transactional
-    public CreateScheduleResponse save(CreateScheduleRequest request) {
+    public CreateScheduleResponse save(Long userId, CreateScheduleRequest request) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new IllegalStateException("존재하지 않는 유저입니다.")
+        );
         Schedule schedule = new Schedule(
-                request.getUsername(),
+                user,
                 request.getTitle(),
                 request.getContent()
         );
@@ -33,8 +39,9 @@ public class ScheduleService {
         return schedules.stream()
                 .map(s -> new GetSchedulesResponse(
                         s.getId(),
-                        s.getUsername(),
-                        s.getTitle()
+                        s.getTitle(),
+                        s.getUser().getId(),
+                        s.getUser().getName()
                 )).toList();
     }
 
@@ -46,7 +53,6 @@ public class ScheduleService {
         );
         return new GetOneScheduleResponse(
                 schedule.getId(),
-                schedule.getUsername(),
                 schedule.getTitle(),
                 schedule.getContent(),
                 schedule.getCreatedAt(),
