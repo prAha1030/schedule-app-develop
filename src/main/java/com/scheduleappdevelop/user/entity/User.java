@@ -23,4 +23,9 @@ public class User extends BaseEntity {
         this.name = name;
         this.email = email;
     }
+
+    // 유저 수정을 위한 세터
+    public void update(String name) {
+        this.name = name;
+    }
 }
