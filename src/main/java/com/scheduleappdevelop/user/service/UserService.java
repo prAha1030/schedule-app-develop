@@ -1,5 +1,7 @@
 package com.scheduleappdevelop.user.service;
 
+import com.scheduleappdevelop.exception.DuplicateEmailException;
+import com.scheduleappdevelop.exception.UserNotFoundException;
 import com.scheduleappdevelop.user.dto.*;
 import com.scheduleappdevelop.user.entity.User;
 import com.scheduleappdevelop.user.repository.UserRepository;
@@ -18,6 +20,10 @@ public class UserService {
     // 유저 생성 요청 -> 응답으로 변환
     @Transactional
     public CreateUserResponse save(CreateUserRequest request) {
+        boolean existence = userRepository.existsByEmail(request.getEmail());
+        if (existence) {
+            throw new DuplicateEmailException("중복된 이메일이 존재합니다.");
+        }
         User user = new User(
                 request.getName(),
                 request.getEmail(),
@@ -34,7 +40,7 @@ public class UserService {
     @Transactional
     public SessionUser login(@Valid LoginRequest request) {
         User user = userRepository.findByEmailAndPassword(request.getEmail(), request.getPassword())
-                .orElseThrow(() -> new IllegalStateException("존재하지 않는 유저입니다."));
+                .orElseThrow(() -> new UserNotFoundException("존재하지 않는 유저입니다."));
         return new SessionUser(
                 user.getId(),
                 user.getName(),
@@ -58,7 +64,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public GetOneUserResponse findOne(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new IllegalStateException("존재하지 않는 유저입니다.")
+                () -> new UserNotFoundException("존재하지 않는 유저입니다.")
         );
         return new GetOneUserResponse(
                 user.getId(),
@@ -72,9 +78,7 @@ public class UserService {
     // 유저 수정 요청 -> 응답
     @Transactional
     public UpdateUserResponse update(Long userId, UpdateUserRequest request) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new IllegalStateException("존재하지 않는 유저입니다.")
-        );
+        User user = userRepository.findById(userId).orElseThrow();
         user.update(request.getName());
         return new UpdateUserResponse(
                 user.getId(),
@@ -85,10 +89,6 @@ public class UserService {
     // 유저 삭제 요청 -> 응답
     @Transactional
     public void delete(Long userId) {
-        boolean existence = userRepository.existsById(userId);
-        if (!existence) {
-            throw new IllegalStateException("존재하지 않는 유저입니다.");
-        }
         userRepository.deleteById(userId);
     }
 }

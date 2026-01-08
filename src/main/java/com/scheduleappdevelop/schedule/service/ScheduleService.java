@@ -1,5 +1,8 @@
 package com.scheduleappdevelop.schedule.service;
 
+import com.scheduleappdevelop.exception.NotOwnerException;
+import com.scheduleappdevelop.exception.ScheduleNotFoundException;
+import com.scheduleappdevelop.exception.UserNotFoundException;
 import com.scheduleappdevelop.schedule.dto.*;
 import com.scheduleappdevelop.schedule.entity.Schedule;
 import com.scheduleappdevelop.schedule.repository.ScheduleRepository;
@@ -20,9 +23,7 @@ public class ScheduleService {
     // 유저의 일정 생성 요청 -> 응답으로 변환
     @Transactional
     public CreateScheduleResponse save(Long userId, CreateScheduleRequest request) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new IllegalStateException("존재하지 않는 유저입니다.")
-        );
+        User user = userRepository.findById(userId).orElseThrow();
         Schedule schedule = new Schedule(
                 user,
                 request.getTitle(),
@@ -47,7 +48,7 @@ public class ScheduleService {
     @Transactional(readOnly = true)
     public GetOneScheduleResponse findOne(Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
-                () -> new IllegalStateException("존재하지 않는 일정입니다.")
+                () -> new ScheduleNotFoundException("존재하지 않는 일정입니다.")
         );
         return new GetOneScheduleResponse(
                 schedule.getId(),
@@ -62,10 +63,10 @@ public class ScheduleService {
     @Transactional
     public UpdateScheduleResponse update(Long userId, Long scheduleId, UpdateScheduleRequest request) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
-                () -> new IllegalStateException("존재하지 않는 일정입니다.")
+                () -> new ScheduleNotFoundException("존재하지 않는 일정입니다.")
         );
         if (!schedule.getId().equals(userId)) {
-            throw new IllegalStateException("다른 유저의 일정을 수정할 수 없습니다.");
+            throw new NotOwnerException("다른 유저의 일정을 수정할 수 없습니다.");
         }
         schedule.update(request.getTitle());
         return new UpdateScheduleResponse(
@@ -78,10 +79,10 @@ public class ScheduleService {
     @Transactional
     public void delete(Long userId, Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
-                () -> new IllegalStateException("존재하지 않는 일정입니다.")
+                () -> new ScheduleNotFoundException("존재하지 않는 일정입니다.")
         );
         if (!schedule.getId().equals(userId)) {
-            throw new IllegalStateException("다른 유저의 일정을 삭제할 수 없습니다.");
+            throw new NotOwnerException("다른 유저의 일정을 삭제할 수 없습니다.");
         }
         scheduleRepository.deleteById(scheduleId);
     }
