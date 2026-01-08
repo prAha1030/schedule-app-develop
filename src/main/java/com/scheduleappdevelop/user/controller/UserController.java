@@ -25,31 +25,31 @@ public class UserController {
 
     // 유저 로그인
     @PostMapping("/login")
-    public ResponseEntity<Void> login(
+    public ResponseEntity<String> login(
             @Valid @RequestBody LoginRequest request, HttpSession session) {
         SessionUser sessionUser = userService.login(request);
         session.setAttribute("loginUser", sessionUser);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.OK).body("성공적으로 로그인되었습니다.");
     }
 
     // 유저 전체 조회
-    @GetMapping("/userlist")
+    @GetMapping("/users")
     public ResponseEntity<List<GetUsersResponse>> getUsers() {
         return ResponseEntity.status(HttpStatus.OK).body(userService.find());
     }
 
     // 유저 단건 조회
-    @GetMapping("/users")
+    @GetMapping("/users/{userId}")
     public ResponseEntity<GetOneUserResponse> getOneUser(
-            @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findOne(sessionUser.getId()));
+            @PathVariable Long userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findOne(userId));
     }
 
     // 유저 수정
     @PutMapping("/users")
     public ResponseEntity<UpdateUserResponse> updateUser(
             @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
-            @RequestBody UpdateUserRequest request) {
+            @Valid @RequestBody UpdateUserRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.update(sessionUser.getId(), request));
     }
 
