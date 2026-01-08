@@ -1,9 +1,6 @@
 package com.scheduleappdevelop.user.service;
 
-import com.scheduleappdevelop.user.dto.CreateUserRequest;
-import com.scheduleappdevelop.user.dto.CreateUserResponse;
-import com.scheduleappdevelop.user.dto.GetOneUserResponse;
-import com.scheduleappdevelop.user.dto.GetUsersResponse;
+import com.scheduleappdevelop.user.dto.*;
 import com.scheduleappdevelop.user.entity.User;
 import com.scheduleappdevelop.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +52,19 @@ public class UserService {
                 user.getEmail(),
                 user.getCreatedAt(),
                 user.getUpdatedAt()
+        );
+    }
+
+    // 유저 수정 요청 -> 응답
+    @Transactional
+    public UpdateUserResponse update(Long userId, UpdateUserRequest request) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new IllegalStateException("존재하지 않는 유저입니다.")
+        );
+        user.update(request.getName());
+        return new UpdateUserResponse(
+                user.getId(),
+                user.getName()
         );
     }
 }
