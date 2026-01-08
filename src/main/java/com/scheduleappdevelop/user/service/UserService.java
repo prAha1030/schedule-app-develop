@@ -2,6 +2,7 @@ package com.scheduleappdevelop.user.service;
 
 import com.scheduleappdevelop.user.dto.CreateUserRequest;
 import com.scheduleappdevelop.user.dto.CreateUserResponse;
+import com.scheduleappdevelop.user.dto.GetOneUserResponse;
 import com.scheduleappdevelop.user.dto.GetUsersResponse;
 import com.scheduleappdevelop.user.entity.User;
 import com.scheduleappdevelop.user.repository.UserRepository;
@@ -40,5 +41,20 @@ public class UserService {
                         u.getName(),
                         u.getEmail()
                 )).toList();
+    }
+
+    // 유저 단건 조회 요청 -> 응답
+    @Transactional(readOnly = true)
+    public GetOneUserResponse findOne(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new IllegalStateException("존재하지 않는 유저입니다.")
+        );
+        return new GetOneUserResponse(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getCreatedAt(),
+                user.getUpdatedAt()
+        );
     }
 }

@@ -2,15 +2,13 @@ package com.scheduleappdevelop.user.controller;
 
 import com.scheduleappdevelop.user.dto.CreateUserRequest;
 import com.scheduleappdevelop.user.dto.CreateUserResponse;
+import com.scheduleappdevelop.user.dto.GetOneUserResponse;
 import com.scheduleappdevelop.user.dto.GetUsersResponse;
 import com.scheduleappdevelop.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,5 +28,12 @@ public class UserController {
     @GetMapping("/users")
     public ResponseEntity<List<GetUsersResponse>> getUsers() {
         return ResponseEntity.status(HttpStatus.OK).body(userService.find());
+    }
+
+    // 유저 단건 조회
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<GetOneUserResponse> getOneUser(
+            @PathVariable Long userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findOne(userId));
     }
 }
