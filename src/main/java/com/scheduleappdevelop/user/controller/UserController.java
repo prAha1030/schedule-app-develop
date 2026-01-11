@@ -56,8 +56,9 @@ public class UserController {
     // 유저 삭제
     @DeleteMapping("/users")
     public ResponseEntity<Void> deleteUser(
-            @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser) {
+            @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser, HttpSession session) {
         userService.delete(sessionUser.getId());
+        session.invalidate();
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
