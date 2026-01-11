@@ -1,25 +1,37 @@
 package com.scheduleappdevelop.schedule.entity;
 
+import com.scheduleappdevelop.comment.entity.Comment;
 import com.scheduleappdevelop.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
 @Table(name = "schedules")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLRestriction("deleted_at is NULL")
+@SQLDelete(sql = "UPDATE schedules SET deleted_at = NOW() WHERE id = ?")
 public class Schedule extends BaseEntity {
     // 일정 식별 번호, 유저 식별 번호, 일정 제목, 일정 내용
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
     private String title;
     private String content;
+    private LocalDateTime deletedAt;
 
     // 식별 번호를 제외한 속성을 지닌 생성자
     public Schedule(User user, String title, String content) {

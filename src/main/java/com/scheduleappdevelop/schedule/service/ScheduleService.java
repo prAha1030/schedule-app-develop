@@ -23,7 +23,9 @@ public class ScheduleService {
     // 유저의 일정 생성 요청 -> 응답으로 변환
     @Transactional
     public CreateScheduleResponse save(Long userId, CreateScheduleRequest request) {
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new UserNotFoundException("존재하지 않는 유저입니다.")
+        );
         Schedule schedule = new Schedule(
                 user,
                 request.getTitle(),

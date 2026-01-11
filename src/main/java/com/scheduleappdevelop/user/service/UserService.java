@@ -88,7 +88,9 @@ public class UserService {
     // 유저 수정 요청 -> 응답
     @Transactional
     public UpdateUserResponse update(Long userId, UpdateUserRequest request) {
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new UserNotFoundException("존재하지 않는 유저입니다.")
+        );
         user.update(request.getName());
         return new UpdateUserResponse(
                 user.getId(),
