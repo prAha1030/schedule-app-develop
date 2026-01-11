@@ -1,5 +1,8 @@
 package com.scheduleappdevelop.schedule.service;
 
+import com.scheduleappdevelop.comment.dto.GetCommentsResponse;
+import com.scheduleappdevelop.comment.entity.Comment;
+import com.scheduleappdevelop.comment.repository.CommentRepository;
 import com.scheduleappdevelop.exception.NotOwnerException;
 import com.scheduleappdevelop.exception.ScheduleNotFoundException;
 import com.scheduleappdevelop.exception.UserNotFoundException;
@@ -19,6 +22,7 @@ import java.util.List;
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
     // 유저의 일정 생성 요청 -> 응답으로 변환
     @Transactional
@@ -52,12 +56,21 @@ public class ScheduleService {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new ScheduleNotFoundException("존재하지 않는 일정입니다.")
         );
+        List<Comment> comments = commentRepository.findBySchedule(schedule);
+        List<GetCommentsResponse> commentsList = comments.stream()
+                .map(c -> new GetCommentsResponse(
+                        c.getId(),
+                        c.getContent(),
+                        c.getCreatedAt(),
+                        c.getUpdatedAt()
+                )).toList();
         return new GetOneScheduleResponse(
                 schedule.getId(),
                 schedule.getTitle(),
                 schedule.getContent(),
                 schedule.getCreatedAt(),
-                schedule.getUpdatedAt()
+                schedule.getUpdatedAt(),
+                commentsList
         );
     }
 
