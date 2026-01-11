@@ -5,6 +5,7 @@ import com.scheduleappdevelop.schedule.service.ScheduleService;
 import com.scheduleappdevelop.user.dto.SessionUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +27,10 @@ public class ScheduleController {
 
     // 일정 전체 조회
     @GetMapping("/users/schedules")
-    public ResponseEntity<List<GetSchedulesResponse>> getSchedules() {
-        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.find());
+    public ResponseEntity<Page<GetSchedulesResponse>> getSchedules(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.find(page, size));
     }
 
     // 일정 단건 조회

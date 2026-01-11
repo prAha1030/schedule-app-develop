@@ -4,6 +4,7 @@ import com.scheduleappdevelop.comment.dto.GetCommentsResponse;
 import com.scheduleappdevelop.comment.entity.Comment;
 import com.scheduleappdevelop.comment.repository.CommentRepository;
 import com.scheduleappdevelop.exception.NotOwnerException;
+import com.scheduleappdevelop.exception.PageLessZeroOrSizeLessOneException;
 import com.scheduleappdevelop.exception.ScheduleNotFoundException;
 import com.scheduleappdevelop.exception.UserNotFoundException;
 import com.scheduleappdevelop.schedule.dto.*;
@@ -12,6 +13,10 @@ import com.scheduleappdevelop.schedule.repository.ScheduleRepository;
 import com.scheduleappdevelop.user.entity.User;
 import com.scheduleappdevelop.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,13 +46,19 @@ public class ScheduleService {
 
     // 일정 전체 조회 요청 -> 전체 목록 응답
     @Transactional(readOnly = true)
-    public List<GetSchedulesResponse> find() {
-        List<Schedule> schedules = scheduleRepository.findAll();
-        return schedules.stream()
-                .map(s -> new GetSchedulesResponse(
-                        s.getId(),
-                        s.getTitle()
-                )).toList();
+    public Page<GetSchedulesResponse> find(int page, int size) {
+        if (page < 0 || size <= 0) {
+            throw new PageLessZeroOrSizeLessOneException("잘못된 입력 : page가 0보다 작거나 size가 1보다 작습니다.");
+        }
+        Pageable pageable = PageRequest.of(page, size, Sort.by("updatedAt").descending());
+        return scheduleRepository.findAllBy(pageable).map(p -> new GetSchedulesResponse(
+                p.getTitle(),
+                p.getContent(),
+                p.getComments().size(),
+                p.getCreatedAt(),
+                p.getUpdatedAt(),
+                p.getUser().getName()
+        ));
     }
 
     // 일정 단건 조회 요청 -> 식별 번호에 따른 일정 응답
