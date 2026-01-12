@@ -1,7 +1,6 @@
 package com.scheduleappdevelop.user.entity;
 
 import com.scheduleappdevelop.schedule.entity.BaseEntity;
-import com.scheduleappdevelop.schedule.entity.Schedule;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,8 +9,6 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Entity
@@ -33,8 +30,6 @@ public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Schedule> schedules = new ArrayList<>();
     @Column(nullable = false, length = 10)
     private String name;
     @Column(nullable = false)

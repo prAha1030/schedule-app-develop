@@ -55,7 +55,7 @@ public class ScheduleService {
         return scheduleRepository.findAllBy(pageable).map(p -> new GetSchedulesResponse(
                 p.getTitle(),
                 p.getContent(),
-                p.getComments().size(),
+                commentRepository.findBySchedule(p).size(),
                 p.getCreatedAt(),
                 p.getUpdatedAt(),
                 p.getUser().getName()
@@ -93,7 +93,7 @@ public class ScheduleService {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new ScheduleNotFoundException("존재하지 않는 일정입니다.")
         );
-        if (!schedule.getId().equals(userId)) {
+        if (!schedule.getUser().getId().equals(userId)) {
             throw new NotOwnerException("다른 유저의 일정을 수정할 수 없습니다.");
         }
         schedule.update(request.getTitle());
@@ -109,9 +109,11 @@ public class ScheduleService {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new ScheduleNotFoundException("존재하지 않는 일정입니다.")
         );
-        if (!schedule.getId().equals(userId)) {
+        if (!schedule.getUser().getId().equals(userId)) {
             throw new NotOwnerException("다른 유저의 일정을 삭제할 수 없습니다.");
         }
+        // 댓글 삭제 후 일정 삭제
+        commentRepository.deleteByScheduleId(scheduleId);
         scheduleRepository.deleteById(scheduleId);
     }
 }
