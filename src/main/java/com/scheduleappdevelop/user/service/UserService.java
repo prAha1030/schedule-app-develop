@@ -1,9 +1,12 @@
 package com.scheduleappdevelop.user.service;
 
+import com.scheduleappdevelop.comment.repository.CommentRepository;
 import com.scheduleappdevelop.config.PasswordEncoder;
 import com.scheduleappdevelop.exception.DuplicateEmailException;
 import com.scheduleappdevelop.exception.PasswordNotMatchException;
 import com.scheduleappdevelop.exception.UserNotFoundException;
+import com.scheduleappdevelop.schedule.entity.Schedule;
+import com.scheduleappdevelop.schedule.repository.ScheduleRepository;
 import com.scheduleappdevelop.user.dto.*;
 import com.scheduleappdevelop.user.entity.User;
 import com.scheduleappdevelop.user.repository.UserRepository;
@@ -19,6 +22,8 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ScheduleRepository scheduleRepository;
+    private final CommentRepository commentRepository;
 
     // 유저 생성 요청 -> 응답 변환
     @Transactional
@@ -104,6 +109,9 @@ public class UserService {
     // 유저 삭제 요청 -> 응답 반환
     @Transactional
     public void delete(Long userId) {
+        // 댓글 삭제 -> 일정 삭제 -> 유저 삭제
+        commentRepository.deleteByScheduleUserId(userId);
+        scheduleRepository.deleteByUserId(userId);
         userRepository.deleteById(userId);
     }
 }

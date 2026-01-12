@@ -1,6 +1,5 @@
 package com.scheduleappdevelop.schedule.entity;
 
-import com.scheduleappdevelop.comment.entity.Comment;
 import com.scheduleappdevelop.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -10,8 +9,6 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Entity
@@ -24,8 +21,6 @@ public class Schedule extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToMany(mappedBy = "schedule", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>();
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
