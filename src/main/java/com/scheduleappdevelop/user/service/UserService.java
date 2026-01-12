@@ -109,6 +109,10 @@ public class UserService {
     // 유저 삭제 요청 -> 응답 반환
     @Transactional
     public void delete(Long userId) {
+        boolean existence = userRepository.existsById(userId);
+        if (!existence) {
+            throw new UserNotFoundException("존재하지 않는 유저입니다");
+        }
         // 댓글 삭제 -> 일정 삭제 -> 유저 삭제
         commentRepository.deleteByScheduleUserId(userId);
         scheduleRepository.deleteByUserId(userId);
