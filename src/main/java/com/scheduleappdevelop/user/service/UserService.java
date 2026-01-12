@@ -20,7 +20,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    // 유저 생성 요청 -> 응답으로 변환
+    // 유저 생성 요청 -> 응답 변환
     @Transactional
     public CreateUserResponse save(CreateUserRequest request) {
         boolean existence = userRepository.existsByEmail(request.getEmail());
@@ -41,7 +41,7 @@ public class UserService {
         );
     }
 
-    // 로그인 요청 -> 응답
+    // 로그인 요청 -> 응답 반환
     @Transactional
     public SessionUser login(@Valid LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
@@ -59,18 +59,21 @@ public class UserService {
         );
     }
 
-    // 유저 전체 조회 요청 -> 응답
+    // 유저 전체 조회 요청 -> 응답 반환
     @Transactional(readOnly = true)
     public List<GetUsersResponse> find() {
-        List<User> users = userRepository.findAll();
+        // 수정일 기준 내림차순 정렬
+        List<User> users = userRepository.findByOrderByUpdatedAtDesc();
         return users.stream()
                 .map(u -> new GetUsersResponse(
                         u.getId(),
-                        u.getName()
+                        u.getName(),
+                        u.getCreatedAt(),
+                        u.getUpdatedAt()
                 )).toList();
     }
 
-    // 유저 단건 조회 요청 -> 응답
+    // 유저 단건 조회 요청 -> 응답 반환
     @Transactional(readOnly = true)
     public GetOneUserResponse findOne(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(
@@ -85,7 +88,7 @@ public class UserService {
         );
     }
 
-    // 유저 수정 요청 -> 응답
+    // 유저 수정 요청 -> 응답 반환
     @Transactional
     public UpdateUserResponse update(Long userId, UpdateUserRequest request) {
         User user = userRepository.findById(userId).orElseThrow(
@@ -98,7 +101,7 @@ public class UserService {
         );
     }
 
-    // 유저 삭제 요청 -> 응답
+    // 유저 삭제 요청 -> 응답 반환
     @Transactional
     public void delete(Long userId) {
         userRepository.deleteById(userId);

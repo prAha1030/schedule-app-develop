@@ -17,7 +17,7 @@ import java.util.List;
 public class ScheduleController {
     private final ScheduleService scheduleService;
 
-    // 유저의 일정 생성
+    // 일정 생성 (로그인 필요)
     @PostMapping("/users/schedules")
     public ResponseEntity<CreateScheduleResponse> createSchedule(
             @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
@@ -25,7 +25,7 @@ public class ScheduleController {
         return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.save(sessionUser.getId(), request));
     }
 
-    // 일정 전체 조회
+    // 일정 전체 조회 (페이지 형식)
     @GetMapping("/users/schedules")
     public ResponseEntity<Page<GetSchedulesResponse>> getSchedules(
             @RequestParam(defaultValue = "0") int page,
@@ -40,7 +40,7 @@ public class ScheduleController {
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.findOne(scheduleId));
     }
 
-    // 유저의 일정 수정
+    // 일정 수정 (로그인 필요)
     @PutMapping("/users/schedules/{scheduleId}")
     public ResponseEntity<UpdateScheduleResponse> updateSchedule(
             @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
@@ -49,7 +49,7 @@ public class ScheduleController {
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.update(sessionUser.getId(), scheduleId, request));
     }
 
-    // 유저의 일정 삭제
+    // 일정 삭제 (로그인 필요)
     @DeleteMapping("/users/schedules/{scheduleId}")
     public ResponseEntity<Void> deleteSchedule(
             @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,

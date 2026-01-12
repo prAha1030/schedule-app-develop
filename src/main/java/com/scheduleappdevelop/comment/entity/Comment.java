@@ -18,17 +18,17 @@ import java.time.LocalDateTime;
 @SQLRestriction("deleted_at is NULL")
 @SQLDelete(sql = "UPDATE comments SET deleted_at = NOW() WHERE id = ?")
 public class Comment extends BaseEntity {
-    // 댓글 식별 번호, 일정 식별 번호, 유저 식별 번호, 댓글 내용, 작성일, 수정일
+    // 댓글 식별 번호, fk 일정, 댓글 내용, 작성일, 수정일, 논리적 삭제 시간
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "schedule_id", nullable = false)
     private Schedule schedule;
+    @Column(nullable = false, length = 200)
     private String content;
     private LocalDateTime deletedAt;
 
-    // 댓글 식별 번호를 제외한 생성자
     public Comment(Schedule schedule, String content) {
         this.schedule = schedule;
         this.content = content;
