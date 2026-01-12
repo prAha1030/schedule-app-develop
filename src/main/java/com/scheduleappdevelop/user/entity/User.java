@@ -18,6 +18,7 @@ import java.util.List;
 @Table(
         name = "users",
         uniqueConstraints = {
+                // 복합 유니크 키 (이메일, 논리적 삭제 시간)
                 @UniqueConstraint(
                         name = "uk_email_deleted_at",
                         columnNames = {"email", "deleted_at"}
@@ -28,18 +29,20 @@ import java.util.List;
 @SQLRestriction("deleted_at is NULL")
 @SQLDelete(sql = "UPDATE users SET deleted_at = NOW() WHERE id = ?")
 public class User extends BaseEntity {
-    // 유저 식별 번호, 유저명, 이메일, 비밀번호, 작성일, 수정일
+    // 유저 식별 번호, 일정, 유저명, 이메일, 비밀번호, 작성일, 수정일, 논리적 삭제 시간
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Schedule> schedules = new ArrayList<>();
+    @Column(nullable = false, length = 10)
     private String name;
+    @Column(nullable = false)
     private String email;
+    @Column(nullable = false)
     private String password;
     private LocalDateTime deletedAt;
 
-    // 유저 식별 번호를 제외한 속성을 지닌 생성자
     public User(String name, String email, String password) {
         this.name = name;
         this.email = email;

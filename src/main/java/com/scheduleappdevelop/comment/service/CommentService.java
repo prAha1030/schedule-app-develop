@@ -16,7 +16,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final ScheduleRepository scheduleRepository;
 
-    // 댓글 생성 요청 -> 응답으로 변
+    // 댓글 생성 요청 -> 응답 반환
     public CreateCommentResponse save(Long scheduleId, CreateCommentRequest request) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new ScheduleNotFoundException("존재하지 않는 일정입니다.")

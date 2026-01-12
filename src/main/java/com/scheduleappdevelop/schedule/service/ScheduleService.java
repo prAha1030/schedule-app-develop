@@ -29,7 +29,7 @@ public class ScheduleService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
 
-    // 유저의 일정 생성 요청 -> 응답으로 변환
+    // 일정 생성 요청 -> 응답 변환
     @Transactional
     public CreateScheduleResponse save(Long userId, CreateScheduleRequest request) {
         User user = userRepository.findById(userId).orElseThrow(
@@ -44,12 +44,13 @@ public class ScheduleService {
         return new CreateScheduleResponse(savedSchedule.getId(), savedSchedule.getTitle());
     }
 
-    // 일정 전체 조회 요청 -> 전체 목록 응답
+    // 일정 전체 조회 요청 -> 응답 변환
     @Transactional(readOnly = true)
     public Page<GetSchedulesResponse> find(int page, int size) {
         if (page < 0 || size <= 0) {
             throw new PageLessZeroOrSizeLessOneException("잘못된 입력 : page가 0보다 작거나 size가 1보다 작습니다.");
         }
+        // 요청 정보의 페이지번호, 크기에 해당하는 페이지 (수정일 기준 내림차순)
         Pageable pageable = PageRequest.of(page, size, Sort.by("updatedAt").descending());
         return scheduleRepository.findAllBy(pageable).map(p -> new GetSchedulesResponse(
                 p.getTitle(),
@@ -61,13 +62,14 @@ public class ScheduleService {
         ));
     }
 
-    // 일정 단건 조회 요청 -> 식별 번호에 따른 일정 응답
+    // 일정 단건 조회 요청 -> 응답 변환 (일정 식별 번호 기준)
     @Transactional(readOnly = true)
     public GetOneScheduleResponse findOne(Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new ScheduleNotFoundException("존재하지 않는 일정입니다.")
         );
-        List<Comment> comments = commentRepository.findBySchedule(schedule);
+        // 댓글들 수정일 기준으로 내림차순 정렬
+        List<Comment> comments = commentRepository.findByScheduleOrderByUpdatedAtDesc(schedule);
         List<GetCommentsResponse> commentsList = comments.stream()
                 .map(c -> new GetCommentsResponse(
                         c.getId(),
@@ -85,7 +87,7 @@ public class ScheduleService {
         );
     }
 
-    // 일정 수정 요청 -> 응답으로 변환
+    // 일정 수정 요청 -> 응답 변환 (일정 식별 번호 기준)
     @Transactional
     public UpdateScheduleResponse update(Long userId, Long scheduleId, UpdateScheduleRequest request) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
@@ -101,7 +103,7 @@ public class ScheduleService {
         );
     }
 
-    // 일정 삭제 요청 -> 식별 번호 기준으로 선별한 일정 삭제
+    // 일정 삭제 요청 -> 응답 변환 (일정 식별 번호 기준)
     @Transactional
     public void delete(Long userId, Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
