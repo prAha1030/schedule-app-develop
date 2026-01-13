@@ -45,7 +45,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.findOne(userId));
     }
 
-    // 유저 수정
+    // 유저 수정 (로그인 필요)
     @PutMapping("/users")
     public ResponseEntity<UpdateUserResponse> updateUser(
             @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser,
@@ -53,11 +53,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.update(sessionUser.getId(), request));
     }
 
-    // 유저 삭제
+    // 유저 삭제 (로그아웃)
     @DeleteMapping("/users")
     public ResponseEntity<Void> deleteUser(
-            @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser) {
+            @SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser, HttpSession session) {
         userService.delete(sessionUser.getId());
+        session.invalidate();
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

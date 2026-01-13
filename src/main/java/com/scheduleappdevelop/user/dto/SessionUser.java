@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class SessionUser {
-    // 세션에 필요한 정보
+    // 세션 저장 정보 (유저 식별 번호, 유저명, 이메일, 비밀번호)
     private final Long id;
     private final String name;
     private final String email;

@@ -8,6 +8,7 @@ import lombok.Getter;
 @Getter
 public class CreateUserRequest {
     // 유저 생성을 위한 요청 정보 (유저명, 이메일, 비밀번호)
+    @NotBlank @Size(max = 10, message = "유저명은 10자 이하여야 합니다.")
     private String name;
     @NotBlank @Email(message = "올바른 이메일 형식이 아닙니다.")
     private String email;
