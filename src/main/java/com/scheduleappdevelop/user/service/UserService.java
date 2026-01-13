@@ -5,7 +5,6 @@ import com.scheduleappdevelop.config.PasswordEncoder;
 import com.scheduleappdevelop.exception.DuplicateEmailException;
 import com.scheduleappdevelop.exception.PasswordNotMatchException;
 import com.scheduleappdevelop.exception.UserNotFoundException;
-import com.scheduleappdevelop.schedule.entity.Schedule;
 import com.scheduleappdevelop.schedule.repository.ScheduleRepository;
 import com.scheduleappdevelop.user.dto.*;
 import com.scheduleappdevelop.user.entity.User;
